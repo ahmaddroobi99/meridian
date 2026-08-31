@@ -5,11 +5,26 @@ export type DbSource = "neon" | "pglite";
 
 function envDatabaseUrl(): string | undefined {
   if (typeof process === "undefined") return undefined;
-  for (const key of ["DATABASE_URL", "NETLIFY_DATABASE_URL", "NETLIFY_DATABASE_URL_UNPOOLED"]) {
+  for (const key of [
+    "DATABASE_URL",
+    "NETLIFY_DATABASE_URL",
+    "NETLIFY_DATABASE_URL_UNPOOLED",
+    "NETLIFY_DB_URL",
+  ]) {
     const value = process.env[key];
     if (value && value.trim()) return value.trim();
   }
   return undefined;
+}
+
+function isServerlessRuntime(): boolean {
+  if (typeof process === "undefined") return false;
+  return Boolean(
+    process.env.NETLIFY ||
+      process.env.VERCEL ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.LAMBDA_TASK_ROOT,
+  );
 }
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
@@ -176,18 +191,7 @@ async function createPgliteSql(): Promise<Sql> {
 let sqlPromise: Promise<Sql> | null = null;
 
 async function resolveDatabaseUrl(): Promise<string | undefined> {
-  const fromEnv = envDatabaseUrl();
-  if (fromEnv) return fromEnv;
-  if (typeof process !== "undefined" && process.env.NETLIFY) {
-    try {
-      const { getConnectionString } = await import("@netlify/database");
-      const url = getConnectionString();
-      if (typeof url === "string" && url.trim()) return url.trim();
-    } catch (err) {
-      console.error("[db] Netlify Database unavailable:", err);
-    }
-  }
-  return undefined;
+  return envDatabaseUrl();
 }
 
 async function createSql(): Promise<Sql> {
@@ -202,6 +206,11 @@ async function createSql(): Promise<Sql> {
     databaseUrl = url;
     dbSource = "neon";
     return createNeonSql();
+  }
+  if (isServerlessRuntime()) {
+    throw new Error(
+      "No DATABASE_URL / NETLIFY_DATABASE_URL — Postgres is required on serverless.",
+    );
   }
   return createPgliteSql();
 }
@@ -258,11 +267,7 @@ export function ensureDbReady(): Promise<void> {
 const globalBoot = globalThis as typeof globalThis & {
   __pgBootstrapPromise__?: Promise<void>;
 };
-if (
-  typeof window === "undefined" &&
-  dbSource === "pglite" &&
-  !(typeof process !== "undefined" && process.env.NETLIFY)
-) {
+if (typeof window === "undefined" && dbSource === "pglite" && !isServerlessRuntime()) {
   globalBoot.__pgBootstrapPromise__ ??= ensureDbReady().catch((err) => {
     globalBoot.__pgBootstrapPromise__ = undefined;
     console.error("[db] PGLite bootstrap failed:", err);

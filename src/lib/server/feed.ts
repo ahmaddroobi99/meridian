@@ -22,14 +22,36 @@ import {
 } from "@/lib/intelligence/queries";
 import { ORGANIZATIONS, SOURCES } from "@/lib/intelligence/sources";
 import { LEARNING_PATHS, ROOT_CATEGORIES, TAXONOMY } from "@/lib/intelligence/taxonomy";
+import type { DashboardPayload } from "@/lib/intelligence/types";
+
+function emptyDashboard(): DashboardPayload {
+  return {
+    lastUpdated: null,
+    topFive: [],
+    today: [],
+    week: [],
+    deepReads: [],
+    breaking: [],
+    research: [],
+    buildThis: [],
+    trends: [],
+    stats: { items: 0, papers: 0, repos: 0, sources: 0 },
+  };
+}
 
 export const bootstrapFeed = createServerFn({ method: "GET" }).handler(async () => {
   try {
     await ensureFresh(false);
+    return await getDashboard();
   } catch (err) {
     console.error("[meridian] ingest failed", err);
+    try {
+      return await getDashboard();
+    } catch (inner) {
+      console.error("[meridian] dashboard failed", inner);
+      return emptyDashboard();
+    }
   }
-  return getDashboard();
 });
 
 export const refreshFeed = createServerFn({ method: "POST" }).handler(async () => {
