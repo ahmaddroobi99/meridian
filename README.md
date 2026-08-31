@@ -66,3 +66,8 @@ API keys are injected by the host (`DATABASE_URL`, `XAI_API_KEY`). Do not put se
 
 - [lattice](https://github.com/ahmaddroobi99/lattice) — visual field manual of the same research stack
 - [qg-lada-lab](https://github.com/ahmaddroobi99/qg-lada-lab) — the scientific work this terminal is meant to serve
+
+---
+
+Account grouping: research first, undergraduate last — see the [profile README](https://github.com/ahmaddroobi99/ahmaddroobi99). GitHub cannot custom-sort the Repositories tab.
+
