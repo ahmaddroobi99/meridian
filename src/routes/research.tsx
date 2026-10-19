@@ -4,12 +4,14 @@ import { fetchItems } from "@/lib/server/feed";
 
 export const Route = createFileRoute("/research")({
   loader: () => fetchItems({ data: { range: "week", limit: 50, wasteMyTime: true } }),
-  component: () => (
-    <CategoryScreen
-      kicker="Primary + high depth"
-      title="Research"
-      body="Papers and lab notes from the last week, filtered for technical depth."
-      items={Route.useLoaderData()}
-    />
-  ),
+  component: function ResearchPage() {
+    return (
+      <CategoryScreen
+        kicker="Primary + high depth"
+        title="Research"
+        body="Papers and lab notes from the last week, filtered for technical depth."
+        items={Route.useLoaderData()}
+      />
+    );
+  },
 });
