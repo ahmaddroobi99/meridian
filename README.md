@@ -54,10 +54,13 @@ Data sources: `src/lib/intelligence/sources.ts`. Preferred order: official API â
 ## Development
 
 ```bash
-npm install
+npm ci
 npm run dev      # port 8080
-npm run build
 npm run typecheck
+npm run lint
+npm test         # 13 app-builder template tests in scripts/ fail on a fresh clone
+npx vite build   # bundle only
+npm run build    # vite build + db:migrate (applies migrations when DATABASE_URL is set)
 ```
 
 API keys are injected by the host (`DATABASE_URL`, `XAI_API_KEY`). Do not put secrets in the repo.
