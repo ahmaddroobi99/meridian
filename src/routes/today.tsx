@@ -4,7 +4,7 @@ import { fetchItems } from "@/lib/server/feed";
 
 export const Route = createFileRoute("/today")({
   loader: () => fetchItems({ data: { range: "today", limit: 50, order: "importance" } }),
-  component: () => {
+  component: function TodayPage() {
     const items = Route.useLoaderData();
     return (
       <CategoryScreen

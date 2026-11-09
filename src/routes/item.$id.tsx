@@ -3,7 +3,7 @@ import { ArrowUpRight, Bookmark, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FeedScaffold, PageHeader } from "@/components/feed/feed-page";
 import { ArticleCard } from "@/components/feed/article-card";
-import { CategoryChips, EvidenceBadge, ItemMeta, ReliabilityBadge, Score } from "@/components/feed/meta";
+import { EvidenceBadge, ItemMeta, ReliabilityBadge, Score } from "@/components/feed/meta";
 import { StackDiagram } from "@/components/viz/stack-diagram";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
